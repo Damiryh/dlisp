@@ -16,6 +16,19 @@ class WrongArgumentsException(Exception):
 
 class Atom: pass
 
+class T(Atom):
+    def eval(self, env): return self
+    def preprocess(self, env): return self
+
+    def __repr__(self): return 'T'
+
+
+class Nil(Atom):
+    def eval(self, env): return self
+    def preprocess(self, env): return self
+
+    def __repr__(self): return 'NIL'
+
 
 class Number(Atom):
     def __init__(self, value):
