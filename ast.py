@@ -83,6 +83,7 @@ class Function(Atom):
 # ==== Args checking functions  ====
 
 def as_list(arg):
+    if type(arg) == Nil: return List([])
     if type(arg) != List:
         raise WrongArgumentsException(List, type(arg))
     return arg
