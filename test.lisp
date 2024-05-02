@@ -1,4 +1,9 @@
 (progn
-    (set 'add (lambda (a) (lambda (b) (+ a b))))
-    (set 'inc (call add 1))
+    (set 'a 2)
+    (set 'b 3)
+    (cond
+        ((< a b) (print a))
+        (T (print b))
+    )
+    (exit 0)
 )

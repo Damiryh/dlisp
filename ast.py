@@ -30,6 +30,16 @@ class Nil(Atom):
     def __repr__(self): return 'NIL'
 
 
+class T(Atom):
+    def __repr__(self): return 'T'
+    def eval(self, env): return self
+
+
+class Nil(Atom):
+    def __repr__(self): return 'NIL'
+    def eval(self, env): return self
+
+
 class Number(Atom):
     def __init__(self, value):
         self.value = value
@@ -92,6 +102,11 @@ def as_func(arg):
         raise WrongArgumentsException(Function, type(arg))
     return arg
 
+def as_T_Nil(arg):
+    if type(arg) == List and len(arg) == 0: return Nil()
+    return T()
+
+
 ONE_OR_MORE = -1 # Const for check args length
 
 def check_length(args, length):
@@ -141,6 +156,7 @@ class List:
 
     def __iter__(self): return self.elements.__iter__()
     def __getitem__(self, index): return self.elements[index]
+    def __len__(self): return len(self.elements)
     
     def eval(self, env):
         head, *args = self.elements
@@ -231,7 +247,53 @@ class List:
             for el in lst: result = func.call([result, el])
             return result
 
-        
+        elif fname == 'print':
+            check_length(args, 1)
+            args = prepare(args)
+            print(args[0])
+            return args[0]
+
+        elif fname == 'exit':
+            check_length(args, 1)
+            args = prepare(args)
+            exit(as_number(args[0]).value)
+            return args[0]
+
+        elif fname == 'cond':
+            check_length(args, ONE_OR_MORE)
+            for branch in args:
+                branch = as_list(branch)
+                check_length(branch, 2)
+                cond, body = branch
+                if type(cond.eval(env)) != Nil:
+                    return body.eval(env)
+                    break
+            return Nil()
+
+        elif fname == '<':
+            check_length(args, 2)
+            args = prepare(args)
+            a = as_number(args[0]).value
+            b = as_number(args[1]).value
+            return T() if a < b else Nil()
+
+        elif fname == '>':
+            check_length(args, 2)
+            args = prepare(args)
+            a = as_number(args[0]).value
+            b = as_number(args[1]).value
+            return T() if a > b else Nil()
+
+        elif fname == '=':
+            check_length(args, 2)
+            args = prepare(args)
+            a = as_number(args[0]).value
+            b = as_number(args[1]).value
+            return T() if a == b else Nil()
+
+        elif fname == 'list':
+            args = prepare(args)
+            return List(args)
 
         elif func := as_func(env[fname]):
             args = prepare(args)
